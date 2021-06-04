@@ -1,17 +1,9 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[2]:
-
-
 from pathlib import Path
 import socket
 import requests
 import requests.packages.urllib3.util.connection as urllib3_cn
 from random import sample
 
-
-# In[3]:
 
 
 # Some globals
@@ -25,16 +17,10 @@ defaultCSVDropPath = Path("data/raw")
 API_BASE = 'https://data.neonscience.org/api/v0/'
 
 
-# In[4]:
-
-
 def allowed_gai_family():
     return socket.AF_INET
 
 urllib3_cn.allowed_gai_family = allowed_gai_family
-
-
-# In[5]:
 
 
 # Get information about the image data set
