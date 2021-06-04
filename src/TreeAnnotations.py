@@ -1,8 +1,8 @@
 import requests
 
-zenodoTreesURL = 'https://zenodo.org/record/3765872'
-zenodoTreeShapeFileAllURL = "https://zenodo.org/record/3765872/files/shapefiles.zip"
-zenodoTreeAnnotationsBySite = {"SJER":"https://zenodo.org/record/3765872/files/SJER_2019.csv",
+ZENODO_TREES_URL = 'https://zenodo.org/record/3765872'
+ZENODO_TREE_SHAPEZIPFILE_URL = "https://zenodo.org/record/3765872/files/shapefiles.zip"
+ZENODO_TREE_ANNOTATIONS_BY_SITE = {"SJER":"https://zenodo.org/record/3765872/files/SJER_2019.csv",
 "ABBY":"https://zenodo.org/record/3765872/files/ABBY_2019.csv",
 "BART":"https://zenodo.org/record/3765872/files/BART_2019.csv",
 "BLAN":"https://zenodo.org/record/3765872/files/BLAN_2019.csv",
@@ -42,9 +42,9 @@ zenodoTreeAnnotationsBySite = {"SJER":"https://zenodo.org/record/3765872/files/S
 
 def getAnnotationURL(selection):
     if selection.upper() == 'ALL':
-        return zenodoTreeShapeFileAllURL
+        return ZENODO_TREE_SHAPEZIPFILE_URL
     else:
-        return zenodoTreeAnnotationsBySite[selection.upper()]
+        return ZENODO_TREE_ANNOTATIONS_BY_SITE[selection.upper()]
 
 
 def downloadAnnotation(selection, downloadFilePath):
