@@ -45,7 +45,8 @@ def getAnnotationURL(selection):
         return zenodoTreeShapeFileAllURL
     else:
         return zenodoTreeAnnotationsBySite[selection.upper()]
-    
+
+
 def downloadAnnotation(selection, downloadFilePath):
     if (selection.upper() == 'ALL'):
         print("Don't currently support getting all shape files\n")

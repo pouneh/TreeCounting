@@ -12,10 +12,11 @@ import csv
 from PIL import Image
 
 
-project_root = Path('..')
+def convert_tif_to_jpg(tifpath, jpgpath):
+    Image.MAX_IMAGE_PIXELS = None
+    with Image.open(tifpath) as im:
+        im.save(jpgpath)
 
-def draw_annotations_on_image(annotations, image):
-    pass
 
 def get_annotation_list_for_image(image_path):
     #parse out geo_index from image path
@@ -111,9 +112,6 @@ def convert_tif_to_jpg(tifpath, jpgpath):
     with Image.open(tifpath) as im:
         im.save(jpgpath)
 
-def test(site = 'yell'):
-    images = get_image_list(site)
-    primary_annotation = get_confidence_and_boxes(site)
-    
-    #image_path = "C:\Users\spark\Desktop\TreeCounting\data\images\2019_YELL_2_535000_4971000_image.tif"
-    return get_annotation_list_for_image(images[0])
+
+def draw_annotations_on_image(annotations, image):
+    pass
