@@ -132,10 +132,7 @@ def split_list_to_train_valid_test(data_list, train_proportion, valid_proportion
 
 
 def yolov5Annotation(geosite, row):
-    geoX, geoY = geosite.split("_")
-    geoX = int(geoX)
-    geoY = int(geoY)
-    
+    geoX, geoY = map(int, geosite.split("_"))   
     
     result = []
     utm_units = 1000.0
@@ -170,12 +167,12 @@ def writeAnnotationToFile(row, outputPath):
 
 def setup_yolo_directories():
     #import os
-    paths =["data/images",
-            "data/images/train",
-            "data/images/valid",
-            "data/labels",
-            "data/labels/train",
-            "data/labels/valid"
+    paths =[Path("data/images"),
+            Path("data/images/train"),
+            Path("data/images/valid"),
+            Path("data/labels/train"),
+            Path("data/labels/valid"),
+            Path("download")
         ]
     for directory in paths:
         if not os.path.exists(directory):

@@ -38,7 +38,7 @@ def getListOfSiteFilesForYear(dataEndpointWithParams):
 # downloads a single photo to the photoDropPath
 def download_image(photoName, photoURL, photoDropPath = defaultPhotoDropPath):    
     photoRequest = requests.get(photoURL, allow_redirects=True)
-    with open(photoDropPath / photoName, 'wb') as f:
+    with open(Path(photoDropPath) / Path(photoName), 'wb') as f:
        f.write(photoRequest.content)
 
 # downloads photos from the list of dictionaries returned from getListOfSiteFilesForYear
@@ -51,7 +51,7 @@ def download_n_images(dataEndpointWithParams, n = DEFAULT_DOWNLOAD_COUNT, photoT
     #dataEndpointWithParams = f'data/{neon_image_product_code}/{site}/{year_month}?package=basic'
     image_list_dictionary = getListOfSiteFilesForYear(dataEndpointWithParams)
     count = n if n < len(image_list_dictionary) else len(image_list_dictionary)
-    subset = dict(sample(image_list_dictionary.items(), n))
+    subset = sample(image_list_dictionary, n)
     download_images(subset, photoTargetDirectory)
 
 def make_data_endpoint(site, year_month, neon_image_product_code=NEON_PRODUCT_CODE):
