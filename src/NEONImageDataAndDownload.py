@@ -26,13 +26,13 @@ urllib3_cn.allowed_gai_family = allowed_gai_family
 # Get information about the image data set
 def getProductInfo(neon_image_product_code):
     product_info_endpoint = f'products/{neon_image_product_code}'
-    product_details = requests.get(apiBase+product_info_endpoint)
+    product_details = requests.get(API_BASE+product_info_endpoint)
     #print(product_details.content)
     return product_details.content
 
 # Returns a list of dictionaries with the photo name and download URL
 def getListOfSiteFilesForYear(dataEndpointWithParams):
-    responseWithListOfSiteFiles = requests.get(apiBase + dataEndpointWithParams)
+    responseWithListOfSiteFiles = requests.get(API_BASE + dataEndpointWithParams)
     return responseWithListOfSiteFiles.json()['data']['files']
 
 # downloads a single photo to the photoDropPath
