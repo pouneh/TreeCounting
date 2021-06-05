@@ -47,13 +47,13 @@ def download_images(image_dictionary, photoDropPath = defaultPhotoDropPath):
         download_image(entry['name'], entry['url'], photoDropPath)
 
 
-def download_n_images(n = DEFAULT_DOWNLOAD_COUNT, dataEndpointWithParams, site, year_month, photoTargetDirectory=defaultPhotoDropPath):
+def download_n_images(dataEndpointWithParams, n = DEFAULT_DOWNLOAD_COUNT, photoTargetDirectory=defaultPhotoDropPath):
     #dataEndpointWithParams = f'data/{neon_image_product_code}/{site}/{year_month}?package=basic'
     image_list_dictionary = getListOfSiteFilesForYear(dataEndpointWithParams)
     count = n if n < len(image_list_dictionary) else len(image_list_dictionary)
     subset = dict(sample(image_list_dictionary.items(), n))
     download_images(subset, photoTargetDirectory)
 
-def make_data_endpoint(neon_image_product_code, site, year_month):
+def make_data_endpoint(site, year_month, neon_image_product_code=NEON_PRODUCT_CODE):
     return f'data/{neon_image_product_code}/{site}/{year_month}?package=basic'
 
