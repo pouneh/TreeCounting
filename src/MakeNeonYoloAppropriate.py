@@ -8,19 +8,46 @@ Created on Thu Jun  3 15:04:11 2021
 import os
 from pathlib import Path
 import glob
+import random
 import csv
 from PIL import Image
 
-meow="potato"
 
-def get_all_bounding_boxes_for_downloaded_tifs_as_list():
-    result = []
-    bounding_boxes = get_all_bounding_boxes()
+def generate_all_bounding_boxes_for_downloaded_tifs_as_list(site = ""):
+    #[(site, (bounding box tuple))]
+    bounding_boxes = get_all_bounding_boxes(site = "")
     tifList = get_image_list()
     for path in tifList:
         geosite = get_geosite_from_image_path(path)
-        result += [{geosite: bounding_boxes[geosite]}]
+        try:
+            for box in bounding_boxes[geosite]:
+                yield geosite, box
+        except Exception:
+            pass
+        
     return result
+def get_all_bounding_boxes_for_downloaded_tifs_as_list(site = ""):
+    #[(site, (bounding box tuple))]
+    result = []
+    bounding_boxes = get_all_bounding_boxes(site = "")
+    tifList = get_image_list()
+    for path in tifList:
+        geosite = get_geosite_from_image_path(path)
+        try:
+            for box in bounding_boxes[geosite]:
+                result.append((geosite,box))
+        except Exception:
+            pass
+        
+    return result
+
+def convert_all_tif_to_jpg_and_place(trainPath='data\\images\\train\\', validPath='data\\images\valid\\'):
+    images = get_image_list()
+    for path in images:
+        imRoot = path.split('.')[0].split('\\')[-1] + ".jpg"
+        print(imRoot)
+        convert_tif_to_jpg(path, trainPath+imRoot)
+        convert_tif_to_jpg(path, validPath+imRoot) 
 
 def convert_tif_to_jpg(tifpath, jpgpath):
     Image.MAX_IMAGE_PIXELS = None
@@ -54,12 +81,11 @@ def get_image_list(site=""):
     return imageFileList
     
 def get_all_bounding_boxes(site=""):
-    #{ key=geo_index, value =[tuple with confidence, and bounding box coordinates]}
+    #[{ key=geo_index, value =[tuple with confidence, and bounding box coordinates]}]
     result = {}
-    csv_annotation = glob.glob(f'{site.upper()}*.csv')
+    csv_annotation = glob.glob(f'data/{site.upper()}*.csv')
     if len(csv_annotation) == 0:
-        # download the CSV
-        print("Lost file")
+        print("Lost file - updated")
         return
     for file in csv_annotation:
         with open(file, mode='r') as infile:
@@ -70,18 +96,29 @@ def get_all_bounding_boxes(site=""):
                 result[row[10]] += [(float(row[1]), float(row[2]), float(row[3]), float(row[4]))]
     return result
 
+def standardize_box_and_write_to_output_path(bounding_boxes, annotationOutputDir):
+    #bounding_boxes = MakeNeonYoloAppropriate.consolidate_bounding_box_list_to_dictionary(train_boxes)
+    for geosite, boxList in bounding_boxes:
+        standardized_annotation = yolov5Annotation(geosite, boxList)
+        fileBase = construct_file_base_from_geosite(geosite)
+        annotationPath = Path(annotationOutputDir + fileBase+ '.txt')
+        writeAnnotationToFile(boxList, annotationPath)
+
+
 def consolidate_bounding_box_list_to_dictionary(data_list):
     result = {}
     for entry in data_list:
-        for geosite, box in entry.items():
+        for geosite, box in entry:
             result.setdefault(geosite, [])
             result[geosite] += [box]
     return result
 
-def split_list_to_train_valid_test(data_list, train_proportion, valid_proportion, test_proportion, maximumTotalCount=len(data_list)):
+def split_list_to_train_valid_test(data_list, train_proportion, valid_proportion, test_proportion, maximumTotalCount=None):
+    if maximumTotalCount is None:
+        maximumTotalCount = len(data_list)
     random.shuffle(data_list)
     assert (train_proportion + valid_proportion + test_proportion <= 1)
-    true_max = maximum_total if maximum_toal < len(data_list) else len(data_list)
+    true_max = maximumTotalCount if maximumTotalCount < len(data_list) else len(data_list)
     
     trainStart = 0
     trainEnd = int(train_proportion*true_max)
@@ -94,7 +131,7 @@ def split_list_to_train_valid_test(data_list, train_proportion, valid_proportion
     
 
 
-def yolov5Annotation(geosite, geositeAnnotationList):
+def yolov5Annotation(geosite, row):
     geoX, geoY = geosite.split("_")
     geoX = int(geoX)
     geoY = int(geoY)
@@ -102,20 +139,20 @@ def yolov5Annotation(geosite, geositeAnnotationList):
     
     result = []
     utm_units = 1000.0
-    for row in geositeAnnotationList:
-        left = row[0] - geoX
-        right = row[2] - geoX
-        top = utm_units - (row[1] - geoY)
-        bottom = utm_units - (row[3] - geoY)
 
-        s_left = left/utm_units
-        s_right = right/utm_units
-        s_top = top/utm_units
-        s_bottom = bottom/utm_units
-        result += [( (s_left+s_right)/2,
-                    (s_top + s_bottom)/2,
-                    s_right - s_left,
-                    s_top - s_bottom)]
+    left = row[0] - geoX
+    right = row[2] - geoX
+    top = utm_units - (row[1] - geoY)
+    bottom = utm_units - (row[3] - geoY)
+
+    s_left = left/utm_units
+    s_right = right/utm_units
+    s_top = top/utm_units
+    s_bottom = bottom/utm_units
+    result += [( (s_left+s_right)/2,
+            (s_top + s_bottom)/2,
+            s_right - s_left,
+            s_top - s_bottom)]
         
     return result
 
@@ -123,17 +160,13 @@ def construct_file_base_from_geosite(geosite):
     tifList = get_image_list()
     for filePath in tifList:
         if geosite in filePath:
-            strippedExtension = filePath.split('.')
+            strippedExtension = filePath.split('.')[0]
             return strippedExtension.split('\\')[-1]
         
-def writeAnnotationToFile(yoloAnnotationList, outputPath):
-    #output = Path("..\\data\\labels\\valid\\2019_YELL_2_535000_4971000_image.txt")
-    #output = Path("..\\data\\labels\\train\\2019_YELL_2_535000_4971000_image.txt")
+def writeAnnotationToFile(row, outputPath):
     txt = "0 {w_c:.8f} {h_c:.8f} {w:.8f} {h:.8f}\n"
-    with open(outputPath, 'a') as f:
-        for row in yoloAnnotationList:
+    with open(outputPath, 'a+') as f:
             f.write(txt.format(w_c=row[0], h_c=row[1], w=row[2], h=row[3]))
-    pass
 
 def setup_yolo_directories():
     #import os
