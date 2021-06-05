@@ -29,7 +29,7 @@ valid_proportion = 0.2
 test_proportion = 0.1
 maximumTotalCount = 1000
 
-defaultCSVDropPath = Path("data\\")
+defaultCSVDropPath = Path("data/")
 
 
 # In[3]:
@@ -51,7 +51,7 @@ TreeAnnotations.downloadAnnotation(site, defaultCSVDropPath/ f"{site.upper()}.cs
 
 #download images
 imageListEndpoint = NEONImageDataAndDownload.make_data_endpoint(site, year_month)
-NEONImageDataAndDownload.download_n_images(imageListEndpoint, numberOfImagesToDownload, "data\\images")
+NEONImageDataAndDownload.download_n_images(imageListEndpoint, numberOfImagesToDownload, "data/images")
 
 
 # In[6]:
@@ -65,7 +65,7 @@ train_boxes, valid_boxes, test_boxes = MakeNeonYoloAppropriate.split_list_to_tra
 # In[ ]:
 
 
-MakeNeonYoloAppropriate.standardize_box_and_write_to_output_path(train_boxes, 'data\\labels\\train\\')
+MakeNeonYoloAppropriate.standardize_box_and_write_to_output_path(train_boxes, 'data/labels/train/')
 
 
 # In[ ]:

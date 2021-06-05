@@ -41,10 +41,10 @@ def get_all_bounding_boxes_for_downloaded_tifs_as_list(site = ""):
         
     return result
 
-def convert_all_tif_to_jpg_and_place(trainPath='data\\images\\train\\', validPath='data\\images\valid\\'):
+def convert_all_tif_to_jpg_and_place(trainPath='data/images/train/', validPath='data/images/valid/'):
     images = get_image_list()
     for path in images:
-        imRoot = path.split('.')[0].split('\\')[-1] + ".jpg"
+        imRoot = path.split('.')[0].split('/')[-1] + ".jpg"
         print(imRoot)
         convert_tif_to_jpg(path, trainPath+imRoot)
         convert_tif_to_jpg(path, validPath+imRoot) 
@@ -77,7 +77,7 @@ def get_annotation_list_for_geosite(geosite, site):
     
     
 def get_image_list(site=""):
-    imageFileList = glob.glob(f'data\\images\\*{site.upper()}*.tif')
+    imageFileList = glob.glob(f'data/images/*{site.upper()}*.tif')
     return imageFileList
     
 def get_all_bounding_boxes(site=""):
@@ -161,7 +161,7 @@ def construct_file_base_from_geosite(geosite):
     for filePath in tifList:
         if geosite in filePath:
             strippedExtension = filePath.split('.')[0]
-            return strippedExtension.split('\\')[-1]
+            return strippedExtension.split('/')[-1]
         
 def writeAnnotationToFile(row, outputPath):
     txt = "0 {w_c:.8f} {h_c:.8f} {w:.8f} {h:.8f}\n"
@@ -170,12 +170,12 @@ def writeAnnotationToFile(row, outputPath):
 
 def setup_yolo_directories():
     #import os
-    paths =["..\\yolov5",
-            "..\\data\\images",
-            "..\\data\\images\\train",
-            "..\\data\\images\\valid",
-            "..\\data\\labels\\train",
-            "..\\data\\labels\\valid"
+    paths =["data/images",
+            "data/images/train",
+            "data/images/valid",
+            "data/labels",
+            "data/labels/train",
+            "data/labels/valid"
         ]
     for directory in paths:
         if not os.path.exists(directory):
